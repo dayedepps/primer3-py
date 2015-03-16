@@ -1386,7 +1386,7 @@ fillMatrix(int maxLoop, thal_results *o)
               if (isFinite(EnthalpyDPT(ii, jj))) {
                 SH[0] = -1.0;
                 SH[1] = _INFINITY;
-                calc_bulge_internal(ii, jj, i, j, SH,0,maxLoop);
+                calc_bulge_internal(ii, jj, i, j, SH, 0, maxLoop);
                 if(SH[0] < MinEntropyCutoff) {
                   /* to not give dH any value if dS is unreasonable */
                   SH[0] = MinEntropy;
