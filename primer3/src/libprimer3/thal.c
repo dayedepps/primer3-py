@@ -1517,9 +1517,15 @@ LSH(int i, int j, double* EntropyEnthalpy)
   S1 = S2 = -1.0;
   H1 = H2 = -_INFINITY;
   T1 = T2 = -_INFINITY;
+
+  // intialize the return value
+  EntropyEnthalpy[0] = -1.0;
+  EntropyEnthalpy[1] = _INFINITY;
+
   if (bpIndx(numSeq1[i], numSeq2[j]) == 0) {
-    EntropyDPT(i, j) = -1.0;
-    EnthalpyDPT(i, j) = _INFINITY;
+    // Below commented out is an error,  it's assigning to somehting that should be immutable
+    // EntropyDPT(i, j) = -1.0;
+    // EnthalpyDPT(i, j) = _INFINITY;
     return;
   }
   S1 = atPenaltyS(numSeq1[i], numSeq2[j]) + tstack2Entropies[numSeq2[j]][numSeq2[j-1]][numSeq1[i]][numSeq1[i-1]];
@@ -1619,9 +1625,13 @@ RSH(int i, int j, double* EntropyEnthalpy)
   S1 = S2 = -1.0;
   H1 = H2 = _INFINITY;
   T1 = T2 = -_INFINITY;
+  // Initialize return value
+  EntropyEnthalpy[0] = -1.0;
+  EntropyEnthalpy[1] = _INFINITY;
   if (bpIndx(numSeq1[i], numSeq2[j]) == 0) {
-    EntropyEnthalpy[0] = -1.0;
-    EntropyEnthalpy[1] = _INFINITY;
+    // NC testist
+    // EntropyEnthalpy[0] = -1.0;
+    // EntropyEnthalpy[1] = _INFINITY;
     return;
   }
   S1 = atPenaltyS(numSeq1[i], numSeq2[j]) + tstack2Entropies[numSeq1[i]][numSeq1[i + 1]][numSeq2[j]][numSeq2[j + 1]];
@@ -1631,7 +1641,8 @@ RSH(int i, int j, double* EntropyEnthalpy)
     S1 = -1.0;
   }
 
-  if(isFinite(dangleEnthalpies3[numSeq1[i]][numSeq1[i + 1]][numSeq2[j]]) && isFinite(dangleEnthalpies5[numSeq1[i]][numSeq2[j]][numSeq2[j + 1]])) {
+  if(isFinite(dangleEnthalpies3[numSeq1[i]][numSeq1[i + 1]][numSeq2[j]]) && 
+        isFinite(dangleEnthalpies5[numSeq1[i]][numSeq2[j]][numSeq2[j + 1]])) {
     S2 = atPenaltyS(numSeq1[i], numSeq2[j]) + dangleEntropies3[numSeq1[i]][numSeq1[i + 1]][numSeq2[j]] +
         dangleEntropies5[numSeq1[i]][numSeq2[j]][numSeq2[j + 1]];
     H2 = atPenaltyH(numSeq1[i], numSeq2[j]) + dangleEnthalpies3[numSeq1[i]][numSeq1[i + 1]][numSeq2[j]] +
@@ -1654,9 +1665,8 @@ RSH(int i, int j, double* EntropyEnthalpy)
       H1 = H2;
       T1 = T2;
     }
-  }
-
-  if(isFinite(dangleEnthalpies3[numSeq1[i]][numSeq1[i + 1]][numSeq2[j]])) {
+    // change below to else if () {} from if () {}
+  } else if(isFinite(dangleEnthalpies3[numSeq1[i]][numSeq1[i + 1]][numSeq2[j]])) {
     S2 = atPenaltyS(numSeq1[i], numSeq2[j]) + dangleEntropies3[numSeq1[i]][numSeq1[i + 1]][numSeq2[j]];
     H2 = atPenaltyH(numSeq1[i], numSeq2[j]) + dangleEnthalpies3[numSeq1[i]][numSeq1[i + 1]][numSeq2[j]];
     if(!isFinite(H2)) {
@@ -1676,9 +1686,8 @@ RSH(int i, int j, double* EntropyEnthalpy)
       H1 = H2;
       T1 = T2;
     }
-  }
-
-  if(isFinite(dangleEnthalpies5[numSeq1[i]][numSeq2[j]][numSeq2[j + 1]])) {
+    // change below to else if () {} from if () {}
+  } else if (isFinite(dangleEnthalpies5[numSeq1[i]][numSeq2[j]][numSeq2[j + 1]])) {
     S2 = atPenaltyS(numSeq1[i], numSeq2[j]) + dangleEntropies5[numSeq1[i]][numSeq2[j]][numSeq2[j + 1]];
     H2 = atPenaltyH(numSeq1[i], numSeq2[j]) + dangleEnthalpies5[numSeq1[i]][numSeq2[j]][numSeq2[j + 1]];
     if(!isFinite(H2)) {
