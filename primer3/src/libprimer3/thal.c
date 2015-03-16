@@ -587,7 +587,8 @@ thal(const unsigned char *oligo_f,
           SH[1] = SH[1] + SMALL_NON_ZERO;
           T1 = ((EnthalpyDPT(i, j)+ SH[1] + dplx_init_H) / ((EntropyDPT(i, j)) + SH[0] +
                 dplx_init_S + RC)) - ABSOLUTE_ZERO;
-          if (T1 > SHleft  && ((EntropyDPT(i, j) + SH[0]) < 0 && (SH[1] + EnthalpyDPT(i, j)) < 0)) {
+          // printf("T1: %f, S: %f, H: %f\n", T1, SH[0], SH[1]);
+          if ( (T1 > SHleft)  && ((EntropyDPT(i, j) + SH[0]) < 0 && (SH[1] + EnthalpyDPT(i, j)) < 0)) {
             SHleft = T1;
             bestI = i;
             bestJ = j;
@@ -1380,7 +1381,8 @@ fillMatrix(int maxLoop, thal_results *o)
               ii -= abs(jj-1);
               jj = 1;
             }
-            for (; ii > 0 && jj < j; --ii, ++jj) {
+            // NC changed ii > 0 to ii > 1 to prevent bulges at end
+            for (; ii > 1 && jj < j; --ii, ++jj) {
               if (isFinite(EnthalpyDPT(ii, jj))) {
                 SH[0] = -1.0;
                 SH[1] = _INFINITY;
@@ -1524,8 +1526,8 @@ LSH(int i, int j, double* EntropyEnthalpy)
 
   if (bpIndx(numSeq1[i], numSeq2[j]) == 0) {
     // Below commented out is an error,  it's assigning to somehting that should be immutable
-    // EntropyDPT(i, j) = -1.0;
-    // EnthalpyDPT(i, j) = _INFINITY;
+    EntropyDPT(i, j) = -1.0;
+    EnthalpyDPT(i, j) = _INFINITY;
     return;
   }
   S1 = atPenaltyS(numSeq1[i], numSeq2[j]) + tstack2Entropies[numSeq2[j]][numSeq2[j-1]][numSeq1[i]][numSeq1[i-1]];
@@ -1601,6 +1603,7 @@ LSH(int i, int j, double* EntropyEnthalpy)
   S2 = atPenaltyS(numSeq1[i], numSeq2[j]);
   H2 = atPenaltyH(numSeq1[i], numSeq2[j]);
   T2 = (H2 + dplx_init_H) / (S2 + dplx_init_S + RC);
+
   if (isFinite(H1)) {
     if(T1 < T2) {
       EntropyEnthalpy[0] = S2;
@@ -1629,7 +1632,7 @@ RSH(int i, int j, double* EntropyEnthalpy)
   EntropyEnthalpy[0] = -1.0;
   EntropyEnthalpy[1] = _INFINITY;
   if (bpIndx(numSeq1[i], numSeq2[j]) == 0) {
-    // NC testist
+    // NC commented
     // EntropyEnthalpy[0] = -1.0;
     // EntropyEnthalpy[1] = _INFINITY;
     return;
@@ -1716,6 +1719,7 @@ RSH(int i, int j, double* EntropyEnthalpy)
       EntropyEnthalpy[0] = S2;
       EntropyEnthalpy[1] = H2;
     } else {
+
       EntropyEnthalpy[0] = S1;
       EntropyEnthalpy[1] = H1;
     }
@@ -2707,6 +2711,7 @@ traceback(int i, int j, double RT, int* ps1, int* ps2, int maxLoop, thal_results
     SH[0] = -1.0;
     SH[1] = _INFINITY;
     LSH(i,j,SH);
+
     if(equal(EntropyDPT(i,j),SH[0]) && equal(EnthalpyDPT(i,j),SH[1])) {
       break;
     }
@@ -2789,7 +2794,7 @@ calcDimer(int* ps1, int* ps2, double temp, double H, double S, int temponly, dou
     // char* duplex[4];
     double G, t;
     t = G = 0;
-    if (!isFinite(temp)){
+    if (!isFinite(temp)) {
         if(temponly == 0) {
         }
         o->temp = 0.0; /* lets use generalization here; this should rather be very negative value */
